@@ -1,0 +1,145 @@
+Disassembly Listing for E165L04CylonEB
+Generated From:
+C:/Users/C0506942/MPLABXProjects/E165L04CylonEB.X/dist/default/production/E165L04CylonEB.X.production.elf
+29-Jan-2026 4:30:06 PM
+
+---  C:/Users/C0506942/MPLABXProjects/E165L04CylonEB.X/E165CylonEB.s  -----------------------------------
+                                                  1:     ;********************ECET 165 LAB 04************************
+                                                  2:     ;   LAB 04 CYLON
+                                                  3:     ;   ECET 165 EMBEDDED MICROCONTROLLERS
+                                                  4:     ;   E165L04CylonEB.s
+                                                  5:     ;   JANUARY 29, 2026
+                                                  6:     ;   ELIJAH BURTNER
+                                                  7:     ;   THIS PROGRAM PRODUCES A CYLON EFFECT ACROSS 8 LEDs.
+                                                  8:     ;***********************************************************
+                                                  9:     
+                                                  10:    PROCESSOR 18F57Q43  ;SET PIC PROCESSOR
+                                                  11:    #include <xc.inc>
+                                                  12:    
+                                                  13:    
+                                                  14:    ; PIC18F57Q43 Configuration Bit Settings
+                                                  15:    
+                                                  16:    ; Assembly source line config statements
+                                                  17:    
+                                                  18:    ; CONFIG1
+                                                  19:      CONFIG  FEXTOSC = OFF         ; External Oscillator Selection (Oscillator not enabled)
+                                                  20:      CONFIG  RSTOSC = HFINTOSC_1MHZ; Reset Oscillator Selection (HFINTOSC with HFFRQ = 4 MHz and CDIV = 4:1)
+                                                  21:    
+                                                  22:    ; CONFIG2
+                                                  23:      CONFIG  CLKOUTEN = OFF        ; Clock out Enable bit (CLKOUT function is disabled)
+                                                  24:      CONFIG  PR1WAY = ON           ; PRLOCKED One-Way Set Enable bit (PRLOCKED bit can be cleared and set only once)
+                                                  25:      CONFIG  CSWEN = ON            ; Clock Switch Enable bit (Writing to NOSC and NDIV is allowed)
+                                                  26:      CONFIG  FCMEN = ON            ; Fail-Safe Clock Monitor Enable bit (Fail-Safe Clock Monitor enabled)
+                                                  27:    
+                                                  28:    ; CONFIG3
+                                                  29:      CONFIG  MCLRE = EXTMCLR       ; MCLR Enable bit (If LVP = 0, MCLR pin is MCLR; If LVP = 1, RE3 pin function is MCLR )
+                                                  30:      CONFIG  PWRTS = PWRT_OFF      ; Power-up timer selection bits (PWRT is disabled)
+                                                  31:      CONFIG  MVECEN = ON           ; Multi-vector enable bit (Multi-vector enabled, Vector table used for interrupts)
+                                                  32:      CONFIG  IVT1WAY = ON          ; IVTLOCK bit One-way set enable bit (IVTLOCKED bit can be cleared and set only once)
+                                                  33:      CONFIG  LPBOREN = OFF         ; Low Power BOR Enable bit (Low-Power BOR disabled)
+                                                  34:      CONFIG  BOREN = SBORDIS       ; Brown-out Reset Enable bits (Brown-out Reset enabled , SBOREN bit is ignored)
+                                                  35:    
+                                                  36:    ; CONFIG4
+                                                  37:      CONFIG  BORV = VBOR_1P9       ; Brown-out Reset Voltage Selection bits (Brown-out Reset Voltage (VBOR) set to 1.9V)
+                                                  38:      CONFIG  ZCD = OFF             ; ZCD Disable bit (ZCD module is disabled. ZCD can be enabled by setting the ZCDSEN bit of ZCDCON)
+                                                  39:      CONFIG  PPS1WAY = ON          ; PPSLOCK bit One-Way Set Enable bit (PPSLOCKED bit can be cleared and set only once; PPS registers remain locked after one clear/set cycle)
+                                                  40:      CONFIG  STVREN = ON           ; Stack Full/Underflow Reset Enable bit (Stack full/underflow will cause Reset)
+                                                  41:      CONFIG  LVP = ON              ; Low Voltage Programming Enable bit (Low voltage programming enabled. MCLR/VPP pin function is MCLR. MCLRE configuration bit is ignored)
+                                                  42:      CONFIG  XINST = OFF           ; Extended Instruction Set Enable bit (Extended Instruction Set and Indexed Addressing Mode disabled)
+                                                  43:    
+                                                  44:    ; CONFIG5
+                                                  45:      CONFIG  WDTCPS = WDTCPS_31    ; WDT Period selection bits (Divider ratio 1:65536; software control of WDTPS)
+                                                  46:      CONFIG  WDTE = OFF            ; WDT operating mode (WDT Disabled; SWDTEN is ignored)
+                                                  47:    
+                                                  48:    ; CONFIG6
+                                                  49:      CONFIG  WDTCWS = WDTCWS_7     ; WDT Window Select bits (window always open (100%); software control; keyed access not required)
+                                                  50:      CONFIG  WDTCCS = SC           ; WDT input clock selector (Software Control)
+                                                  51:    
+                                                  52:    ; CONFIG7
+                                                  53:      CONFIG  BBSIZE = BBSIZE_512   ; Boot Block Size selection bits (Boot Block size is 512 words)
+                                                  54:      CONFIG  BBEN = OFF            ; Boot Block enable bit (Boot block disabled)
+                                                  55:      CONFIG  SAFEN = OFF           ; Storage Area Flash enable bit (SAF disabled)
+                                                  56:      CONFIG  DEBUG = OFF           ; Background Debugger (Background Debugger disabled)
+                                                  57:    
+                                                  58:    ; CONFIG8
+                                                  59:      CONFIG  WRTB = OFF            ; Boot Block Write Protection bit (Boot Block not Write protected)
+                                                  60:      CONFIG  WRTC = OFF            ; Configuration Register Write Protection bit (Configuration registers not Write protected)
+                                                  61:      CONFIG  WRTD = OFF            ; Data EEPROM Write Protection bit (Data EEPROM not Write protected)
+                                                  62:      CONFIG  WRTSAF = OFF          ; SAF Write protection bit (SAF not Write Protected)
+                                                  63:      CONFIG  WRTAPP = OFF          ; Application Block write protection bit (Application Block not write protected)
+                                                  64:    
+                                                  65:    ; CONFIG10
+                                                  66:      CONFIG  CP = OFF              ; PFM and Data EEPROM Code Protection bit (PFM and Data EEPROM code protection disabled)
+                                                  67:      
+                                                  68:    ;   -----------END CONFIG--------------
+                                                  69:      
+                                                  70:     PSECT udata_acs	; Access RAM GPRs are available 0x00 to 0x5F
+                                                  71:    
+                                                  72:     ;Setup counter globals
+                                                  73:     global innerCount
+                                                  74:     global outerCount
+                                                  75:    
+                                                  76:    innerCount: 	DS 1
+                                                  77:    outerCount: 	DS 1
+                                                  78:    
+                                                  79:      PSECT resetVec, class=CODE, reloc=2
+                                                  80:    resetVec:
+0000  EFD5     GOTO 0x1FFAA                       81:        GOTO main
+                                                  82:        
+                                                  83:        PSECT code
+                                                  84:    main:				;PROGRAM STARTS HERE
+                                                  85:    				;SETUP
+1FFAA  88C7     BSF 0xFC7, 4, ACCESS              86:        BSF TRISB4			;MAKE RB4 AN INPUT	
+1FFAC  6AD0     CLRF 0xFD0, ACCESS                87:        CLRF PORTC, A		;CLEAR PORT C BEFORE MAKING INPUT	
+1FFAE  6AC8     CLRF 0xFC8, ACCESS                88:        CLRF TRISC, A		;MAKE PORTC AN OUTPUT
+                                                  89:        
+1FFB0  6AD3     CLRF 0xFD3, ACCESS                90:        CLRF    PORTF, A		;CLEARING PORT F
+                                                  91:    				;ENABLE DIGITAL DRIVERS
+1FFB2  0104     MOVLB 0x4                         92:        BANKSEL ANSELC		;SELECT PORT C
+1FFB4  6B10     CLRF 0x10, BANKED                 93:        CLRF ANSELC, B		;CLEAR TO SET DIGITAL
+                                                  94:        
+                                                  95:    				;SETUP WEAK PULLUP RESISTORS
+1FFB6  0104     MOVLB 0x4                         96:        BANKSEL WPUB		;SELECT BANK
+1FFB8  8909     BSF 0x9, 4, BANKED                97:        BSF	WPUB4			;TURN ON WEAK PULLUPS
+1FFBA  80D0     BSF 0xFD0, 0, ACCESS              98:        BSF RC0			;SET PORTC BIT 0 TO HAVE AN LED / BIT TO ROTATE
+                                                  99:        
+                                                  100:   mainLoop:
+1FFBC  ECE4     CALL 0x1FFC8, 0                   101:       CALL runLeft		;ROTATE ACTIVE LED TO THE LEFT
+1FFC0  ECEB     CALL 0x1FFD6, 0                   102:       CALL runRight		;ROTATE ACTIVE LED TO THE RIGHT
+1FFC4  EFDE     GOTO 0x1FFBC                      103:       GOTO mainLoop		;KEEP RUNNING MAIN LOOP
+                                                  104:       
+                                                  105:   runLeft:
+1FFC8  46D0     RLNCF 0xFD0, F, ACCESS            106:       RLNCF PORTC, A		;ROTATE PORTC (ACTIVE LED) LEFT WITH NO CARRY
+1FFCA  ECF2     CALL 0x1FFE4, 0                   107:       CALL delay			;ADD A DELAY INBETWEEN
+1FFCE  BED0     BTFSC 0xFD0, 7, ACCESS            108:       BTFSC RC7			;CHECK IF BIT / LED IN POSITION 7 IS CLEAR
+1FFD0  0012     RETURN 0                          109:       RETURN			;IF THE BIT IS SET, BREAK THIS LOOP AND GOTO MAIN LOOP (RIGHT DIRECTION LOOP RUNS NEXT)
+1FFD2  EFE4     GOTO 0x1FFC8                      110:       GOTO runLeft		;STAY IN THIS LOOP OTHERWISE
+                                                  111:       
+                                                  112:   runRight:
+1FFD6  42D0     RRNCF 0xFD0, F, ACCESS            113:       RRNCF PORTC, A		;ROTATE PORTC (ACTIVE LED) RIGHT WITH NO CARRY
+1FFD8  ECF2     CALL 0x1FFE4, 0                   114:       CALL delay			;ADD A DELAY INBETWEEN
+1FFDC  B0D0     BTFSC 0xFD0, 0, ACCESS            115:       BTFSC RC0			;CHECK IF BIT / LED IN POSITION 0 IS CLEAR
+1FFDE  0012     RETURN 0                          116:       RETURN			;IF THE BIT IS SET, BREAK THIS LOOP AND GOTO MAIN LOOP (LEFT DIRECTION LOOP RUNS NEXT)
+1FFE0  EFEB     GOTO 0x1FFD6                      117:       GOTO runRight		;STAY IN THIS LOOP OTHERWISE
+                                                  118:           
+                                                  119:    delay:
+1FFE4  0E14     MOVLW 0x14                        120:       MOVLW 20			;MOVE LITERAL TO W
+1FFE6  6E01     MOVWF 0x1, ACCESS                 121:       MOVWF outerCount, C		;STORE IT IN OUTERCOUNT (DELAY MULT)
+1FFE8  0EB4     MOVLW 0xB4                        122:       MOVLW 180
+1FFEA  6E00     MOVWF 0x0, ACCESS                 123:       MOVWF innerCount, C
+                                                  124:   
+                                                  125:   delayOuter:
+                                                  126:   delayInner:
+1FFEC  2E00     DECFSZ 0x0, F, ACCESS             127:       DECFSZ  innerCount, F, A	;1 CYCLE IF NOT 0, 3 CYCLES IF SKIP | DECREMENT F, SKIP IF ZERO
+1FFEE  EFF6     GOTO 0x1FFEC                      128:       GOTO    delayInner		;2 CYCLES | RESET PC @ DELAY INNER
+1FFF2  2E01     DECFSZ 0x1, F, ACCESS             129:       DECFSZ  outerCount, F, A
+1FFF4  EFF6     GOTO 0x1FFEC                      130:       GOTO    delayOuter		;RUN AGAIN
+1FFF8  0000     NOP                               131:       NOP				;1 CLOCK CYCLE
+1FFFA  0000     NOP                               132:       NOP				;1 CLOCK CYCLE
+1FFFC  0012     RETURN 0                          133:       RETURN			;RETURN TO MAIN LOOP / PC
+                                                  135:       
+                                                  136:       end resetVec
+                                                  137:   
+                                                  138:   
+                                                  139:   
+                                                  140:   
